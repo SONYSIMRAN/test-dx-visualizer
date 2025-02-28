@@ -57,6 +57,7 @@ jobs:
             # mandatory
             -Dsonar.projectKey=SONYSIMRAN_test-dx-visualizer
             -Dsonar.organization=sonysimran
+            -Dsonar.sources=force-app/main/default/lwc 
             # Comma-separated paths to directories containing main source files.
             #-Dsonar.sources=force-app/main/default/lwc , default is project base directory
             # Comma-separated paths to directories containing test source files.
