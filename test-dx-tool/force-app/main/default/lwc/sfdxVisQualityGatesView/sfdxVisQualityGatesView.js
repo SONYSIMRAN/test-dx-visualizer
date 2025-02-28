@@ -10,8 +10,8 @@ export default class SfdxVisQualityGatesView extends LightningElement {
   kanbanView = true;
   listView = true;
   buttonPackageDep = false;
-  buttonSandboxCodeSize = false;
-  buttonPackageSorting = false;
+//   buttonSandboxCodeSize = false;
+//   buttonPackageSorting = false;
   selectSandbox = false;
   combobox360View = false;
   comboboxEnvGatesView = false;
