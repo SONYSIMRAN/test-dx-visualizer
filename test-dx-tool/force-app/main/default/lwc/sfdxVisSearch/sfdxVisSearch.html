@@ -1,0 +1,114 @@
+<template>
+    <div class="bg-light dxAppPage">
+        <lightning-spinner if:true={isLoading}></lightning-spinner>
+        <template if:true={searchView}>
+            <c-dx-header card-view={cardView} kanban-view={kanbanView} list-view={listView}
+                button-package-dep={buttonPackageDep} button-sandbox-code-size={buttonSandboxCodeSize}
+                button-package-sorting={buttonPackageSorting} select-sandbox={selectSandbox} sandbox-list={sandboxList}
+                onchildmethod={getSandbox}></c-dx-header>
+        </template>
+        <!-- Body section -->
+        <div class="container my-3">
+            <div class="card">
+                <div class="d-flex justify-content-center" style="min-height: 113px">
+                    <div>
+                        <template lwc:if={metaData}>
+                            <lightning-combobox style="width: 200px;"
+                                class="mx-2 mb-2 border border-light metadata-combobox" name="metadata"
+                                label="Select Metadata" value={metaDataValue} placeholder="Select Metadata"
+                                options={metaData} onchange={handleMetadataChange}></lightning-combobox>
+                            <template lwc:if={metaDataValue}>
+                                <p class="fst-italic small"><span class="text-secondary">Selected:</span><span
+                                        class="text-success ps-1">{metaDataValue}</span></p>
+                            </template>
+                            <template lwc:else>
+                                <!-- <p class="fst-italic small"><span class="text-info">Select metadata</span></p> -->
+                            </template>
+                        </template>
+                        <template lwc:else>
+                            <lightning-combobox style="width: 200px;"
+                                class="mx-2 mb-2 border border-light metadata-combobox" name="metadata"
+                                label="Select Metadata" value="" placeholder="Select Metadata"
+                                options="No metadata are found!."></lightning-combobox>
+                        </template>
+                    </div>
+                    <div>
+                        <lightning-input style="min-width: 450px;" name="enter-search" autocomplete="off"
+                            class="mx-2 mb-2 border border-light custom-search-input" type="search" label="Search"
+                            placeholder="Enter minimum 3 characters to search" onkeyup={handleSearchKeyUp}></lightning-input>
+                            <template if:true={result}>
+                                <span class="text-secondary fst-italic small"><span class="text-success">{resultCount}</span> results found for "{queryTerm}"</span>
+                            </template>
+                            <!-- <template if:false={searchResults}>
+                                <span class="text-secondary fst-italic small">No results found for "{queryTerm}"</span>
+                            </template> -->
+                            <template if:true={searchKeywords}>
+                                <p class="fst-italic small"><span class="text-info">Enter search keywords</span></p>
+                            </template>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row" style="min-height: 300px;">
+                <template if:true={searchLoader}>
+                    <c-dx-vis-loader></c-dx-vis-loader>
+                </template>
+                <template if:false={searchLoader}>
+                <template lwc:if={searchResults}>
+                    <div class="col-md-12">
+                        <template for:each={result} for:item="item">
+                            <div class="card my-3 search-card" key={item.metadataname.id}>
+                                <c-dx-vis-search-content item={item}></c-dx-vis-search-content>
+                            </div>
+                        </template>                       
+                    </div>
+                </template>
+                <template lwc:else>
+                    <div class="col-md-12 search-not-ready d-flex justify-content-center" style="min-height: 300px;">
+                        <svg fill="#88b8e1" style="opacity: .2;" height="256px" width="256px" version="1.1" id="Capa_1"
+                            viewBox="0 0 303.37 303.37" xml:space="preserve" stroke="#88b8e1"
+                            stroke-width="0.0030337400000000005">
+                            <g stroke-width="0" />
+                            <g stroke-linecap="round" stroke-linejoin="round" />
+                            <g>
+                                <g>
+                                    <path
+                                        d="M268.291,177.313c-4.144,0-8.12,0.727-11.814,2.052l-17.319-27.524c10.331-10.171,16.751-24.302,16.751-39.91 c0-30.899-25.138-56.037-56.037-56.037s-56.037,25.138-56.037,56.037c0,12.226,3.947,23.54,10.617,32.762l-33.742,33.954 c-4.438-2.404-9.515-3.771-14.907-3.771c-5.323,0-10.339,1.336-14.736,3.684l-19.721-20.688c5.93-7.037,9.514-16.113,9.514-26.014 c0-22.293-18.137-40.43-40.43-40.43S0,109.565,0,131.858s18.136,40.43,40.429,40.43c5.854,0,11.416-1.261,16.444-3.509 l21.387,22.436c-2.456,4.474-3.856,9.606-3.856,15.06c0,17.313,14.085,31.398,31.398,31.398s31.398-14.085,31.398-31.398 c0-5.388-1.365-10.462-3.766-14.897l33.756-33.969c9.207,6.635,20.491,10.559,32.68,10.559c8.815,0,17.157-2.052,24.584-5.694 l17.197,27.329c-5.258,6.136-8.446,14.097-8.446,22.793c0,19.345,15.739,35.084,35.084,35.084s35.083-15.739,35.083-35.084 S287.636,177.313,268.291,177.313z M161.834,111.931c0-20.974,17.063-38.037,38.037-38.037s38.037,17.063,38.037,38.037 s-17.063,38.037-38.037,38.037S161.834,132.904,161.834,111.931z M105.802,219.673c-7.388,0-13.398-6.011-13.398-13.398 s6.011-13.398,13.398-13.398s13.398,6.011,13.398,13.398S113.19,219.673,105.802,219.673z M18,131.858 c0-12.368,10.062-22.43,22.429-22.43s22.43,10.062,22.43,22.43s-10.062,22.43-22.43,22.43S18,144.226,18,131.858z M268.291,229.48 c-9.42,0-17.084-7.664-17.084-17.084s7.664-17.084,17.084-17.084s17.083,7.664,17.083,17.084S277.71,229.48,268.291,229.48z" />
+                                </g>
+                            </g>
+                        </svg>
+                        <svg fill="#eadc5d" style="opacity: .3;" height="256px" width="256px" version="1.1" id="Capa_2"
+                            viewBox="0 0 303.37 303.37" xml:space="preserve" stroke="#eadc5d"
+                            stroke-width="0.0030337400000000005">
+                            <g stroke-width="0" />
+                            <g stroke-linecap="round" stroke-linejoin="round" />
+                            <g>
+                                <g>
+                                    <path
+                                        d="M268.291,177.313c-4.144,0-8.12,0.727-11.814,2.052l-17.319-27.524c10.331-10.171,16.751-24.302,16.751-39.91 c0-30.899-25.138-56.037-56.037-56.037s-56.037,25.138-56.037,56.037c0,12.226,3.947,23.54,10.617,32.762l-33.742,33.954 c-4.438-2.404-9.515-3.771-14.907-3.771c-5.323,0-10.339,1.336-14.736,3.684l-19.721-20.688c5.93-7.037,9.514-16.113,9.514-26.014 c0-22.293-18.137-40.43-40.43-40.43S0,109.565,0,131.858s18.136,40.43,40.429,40.43c5.854,0,11.416-1.261,16.444-3.509 l21.387,22.436c-2.456,4.474-3.856,9.606-3.856,15.06c0,17.313,14.085,31.398,31.398,31.398s31.398-14.085,31.398-31.398 c0-5.388-1.365-10.462-3.766-14.897l33.756-33.969c9.207,6.635,20.491,10.559,32.68,10.559c8.815,0,17.157-2.052,24.584-5.694 l17.197,27.329c-5.258,6.136-8.446,14.097-8.446,22.793c0,19.345,15.739,35.084,35.084,35.084s35.083-15.739,35.083-35.084 S287.636,177.313,268.291,177.313z M161.834,111.931c0-20.974,17.063-38.037,38.037-38.037s38.037,17.063,38.037,38.037 s-17.063,38.037-38.037,38.037S161.834,132.904,161.834,111.931z M105.802,219.673c-7.388,0-13.398-6.011-13.398-13.398 s6.011-13.398,13.398-13.398s13.398,6.011,13.398,13.398S113.19,219.673,105.802,219.673z M18,131.858 c0-12.368,10.062-22.43,22.429-22.43s22.43,10.062,22.43,22.43s-10.062,22.43-22.43,22.43S18,144.226,18,131.858z M268.291,229.48 c-9.42,0-17.084-7.664-17.084-17.084s7.664-17.084,17.084-17.084s17.083,7.664,17.083,17.084S277.71,229.48,268.291,229.48z" />
+                                </g>
+                            </g>
+                        </svg>
+                        <svg fill="#b1ea5d" style="opacity: .3;" height="256px" width="256px" version="1.1" id="Capa_3"
+                            viewBox="0 0 303.37 303.37" xml:space="preserve" stroke="#b1ea5d"
+                            stroke-width="0.0030337400000000005">
+                            <g stroke-width="0" />
+                            <g stroke-linecap="round" stroke-linejoin="round" />
+                            <g>
+                                <g>
+                                    <path
+                                        d="M268.291,177.313c-4.144,0-8.12,0.727-11.814,2.052l-17.319-27.524c10.331-10.171,16.751-24.302,16.751-39.91 c0-30.899-25.138-56.037-56.037-56.037s-56.037,25.138-56.037,56.037c0,12.226,3.947,23.54,10.617,32.762l-33.742,33.954 c-4.438-2.404-9.515-3.771-14.907-3.771c-5.323,0-10.339,1.336-14.736,3.684l-19.721-20.688c5.93-7.037,9.514-16.113,9.514-26.014 c0-22.293-18.137-40.43-40.43-40.43S0,109.565,0,131.858s18.136,40.43,40.429,40.43c5.854,0,11.416-1.261,16.444-3.509 l21.387,22.436c-2.456,4.474-3.856,9.606-3.856,15.06c0,17.313,14.085,31.398,31.398,31.398s31.398-14.085,31.398-31.398 c0-5.388-1.365-10.462-3.766-14.897l33.756-33.969c9.207,6.635,20.491,10.559,32.68,10.559c8.815,0,17.157-2.052,24.584-5.694 l17.197,27.329c-5.258,6.136-8.446,14.097-8.446,22.793c0,19.345,15.739,35.084,35.084,35.084s35.083-15.739,35.083-35.084 S287.636,177.313,268.291,177.313z M161.834,111.931c0-20.974,17.063-38.037,38.037-38.037s38.037,17.063,38.037,38.037 s-17.063,38.037-38.037,38.037S161.834,132.904,161.834,111.931z M105.802,219.673c-7.388,0-13.398-6.011-13.398-13.398 s6.011-13.398,13.398-13.398s13.398,6.011,13.398,13.398S113.19,219.673,105.802,219.673z M18,131.858 c0-12.368,10.062-22.43,22.429-22.43s22.43,10.062,22.43,22.43s-10.062,22.43-22.43,22.43S18,144.226,18,131.858z M268.291,229.48 c-9.42,0-17.084-7.664-17.084-17.084s7.664-17.084,17.084-17.084s17.083,7.664,17.083,17.084S277.71,229.48,268.291,229.48z" />
+                                </g>
+                            </g>
+                        </svg>
+                    </div>
+                </template>
+            </template>
+            </div>
+        </div>
+        <!-- Body Section -->
+
+        <!-- Footer Section -->
+        <c-dx-footer></c-dx-footer>
+    </div>
+</template>
