@@ -1,0 +1,151 @@
+<template>
+    <template if:true={formattedData}>
+        <div class="bg-light">
+            <lightning-spinner if:true={isLoading}></lightning-spinner>
+            <c-dx-header card-view={cardView} kanban-view={kanbanView} list-view={listView}
+                button-package-dep={buttonPackageDep} button-sandbox-code-size={buttonSandboxCodeSize}
+                button-package-sorting={buttonPackageSorting} combobox-env-gates-view={comboboxEnvGatesView}
+                view-quality-gates-env-names={viewQualityGatesEnvNames} onchildmethod={getSandbox}
+                sandbox-list={sandboxList}></c-dx-header>
+            <div class="container my-3">
+                <lightning-card title="Quality Gates Status" icon-name="custom:custom19">
+                </lightning-card>
+                <!-- </div> -->
+
+                <div class="quality-gate-table slds-border_right slds-border_left slds-p-around_none slds-m-top_small">
+                    <table
+                        class="slds-table slds-table_cell-buffer slds-no-row-hover slds-table_bordered slds-table_fixed-layout">
+                        <thead>
+                            <tr class="slds-line-height_reset env-gate-sticky-header">
+                                <!-- <th scope="col" class="slds-truncate" title="Environment Name">Environment Name</th> -->
+                                <th scope="col" colspan="2" class="slds-truncate" title="Package Name"></th>
+                                <th scope="col" colspan="3" class="slds-truncate text-center" title="ZTT Results">ZTT
+                                    Details</th>
+                                <!-- <th scope="col" class="slds-truncate" title="ZTT Status">ZTT Status</th>
+                            <th scope="col" class="slds-truncate" title="Enabled ZTT">Enabled ZTT</th> -->
+                                <th scope="col" colspan="3" class="slds-truncate text-center" title="PDT Results">PDT
+                                    Details</th>
+                                <!-- <th scope="col" class="slds-truncate" title="PDT Status">PDT Status</th>
+                            <th scope="col" class="slds-truncate" title="Enabled PDT">Enabled PDT</th> -->
+                                <th scope="col" colspan="3" class="slds-truncate" title="Risk Score"></th>
+                            </tr>
+                            <tr class="slds-line-height_reset env-gate-sticky-header">
+                                <!-- <th scope="col" class="slds-truncate" title="Environment Name">Environment Name</th> -->
+                                <!-- <th scope="col" colspan="2" class="slds-truncate" title="Package Name">Package </th> -->
+                                <th scope="col" colspan="2" onclick={handleSort} data-column="name">
+                                        <c-dx-vis-sort-env-gate-header icon-name={sortDirectionIcon} hide-icon={hideSortIcon} onselection={selectedNavHandler} name="Package Name"></c-dx-vis-sort-env-gate-header>
+                                </th>
+                                <!-- <th scope="col" class="slds-truncate" title="Latest Deployed Version">Latest Deployed Version</th> -->
+                                <!-- <th scope="col" class="slds-truncate" title="ZTT Results">Results</th> -->
+                                <th scope="col" class="slds-truncate" onclick={handleSort} data-column="zttResults">
+                                    <c-dx-vis-sort-env-gate-header icon-name={sortDirectionIcon} hide-icon={hideSortIcon} onselection={selectedNavHandler} name="ZTT Results"></c-dx-vis-sort-env-gate-header>
+                                    <!-- <div role="button" class="slds-grid slds-grid_align-spread">
+                                        <div>Results</div>
+                                        <lightning-icon icon-name={sortDirectionIcon} size='xx-small' title="Sort"></lightning-icon>
+                                    </div> -->
+                                </th>
+                                <th scope="col" class="slds-truncate" data-column="zttStatus" title="ZTT Status">
+                                    <div class="envgate-header-dropdown">
+                                    <c-dx-vis-status-filter data-column="zttStatus" label="Status" onstatuschange={handleStatusFilterChange}></c-dx-vis-status-filter>
+                                    </div>
+                                </th>
+                                <!-- <th scope="col" class="slds-truncate" title="Enabled ZTT">Enabled Gate</th> -->
+                                <th scope="col" class="slds-truncate" data-column="enabledZTT" title="Enabled ZTT">
+                                    <div class="envgate-header-dropdown">
+                                    <c-dx-vis-enabled-filter data-column="enabledZTT" label="Enabled Gate"  default-selected-enabled={selectedEnabled} onenabledchange={handleEnabledFilterChange}></c-dx-vis-enabled-filter>
+                                </div>
+                                </th>
+                                <!-- <th scope="col" class="slds-truncate" title="PDT Results">Results</th> -->
+                                <th scope="col" class="slds-truncate" onclick={handleSort} data-column="pdtResults">
+                                    <!-- <div role="button" class="slds-grid slds-grid_align-spread">
+                                        <div>Results</div>
+                                        <lightning-icon icon-name={sortDirectionIcon} size='xx-small' title="Sort"></lightning-icon>
+                                    </div> -->
+                                    <c-dx-vis-sort-env-gate-header icon-name={sortDirectionIcon} hide-icon={hideSortIcon} onselection={selectedNavHandler} name="PDT Results"></c-dx-vis-sort-env-gate-header>
+                                </th>
+                                <!-- <th scope="col" class="slds-truncate" title="PDT Status">Status</th> -->
+                                <th scope="col" class="slds-truncate" data-column="pdtStatus" title="PDT Status">
+                                    <div class="envgate-header-dropdown">
+                                    <c-dx-vis-status-filter data-column="pdtStatus" label="Status" onstatuschange={handleStatusFilterChange}></c-dx-vis-status-filter>
+                                    </div>
+                                </th>
+                                <th scope="col" class="slds-truncate" data-column="enabledPDT" title="Enabled PDT">
+                                    <div class="envgate-header-dropdown">
+                                    <c-dx-vis-enabled-filter data-column="enabledPDT" label="Enabled Gate" onenabledchange={handleEnabledFilterChange}></c-dx-vis-enabled-filter>
+                                </div>
+                                </th>
+                                <!-- <th scope="col" class="slds-truncate" title="Risk Score">Risk Score</th> -->
+                                <th scope="col" class="slds-truncate" onclick={handleSort} data-column="riskScore">
+                                    <c-dx-vis-sort-env-gate-header icon-name={sortDirectionIcon} hide-icon={hideSortIcon} onselection={selectedNavHandler} name="Risk Score"></c-dx-vis-sort-env-gate-header>
+                                </th>
+                                <!-- <th scope="col" class="slds-truncate" title="Test Execution Status">Execution Status</th> -->
+                                <th scope="col" class="slds-truncate" data-column="testExecutionTimeStatus" title="Execution Status">
+                                    <div class="envgate-header-dropdown">
+                                    <c-dx-vis-status-filter data-column="testExecutionTimeStatus" label="Execution Status" onstatuschange={handleStatusFilterChange} ></c-dx-vis-status-filter>
+                                    </div>
+                                </th>
+                                <!-- <th scope="col" class="slds-truncate" title="Release Date">Release Date</th> -->
+                                <th scope="col" class="slds-truncate" onclick={handleSort} data-column="release">
+                                        <c-dx-vis-sort-env-gate-header icon-name={sortDirectionIcon} hide-icon={hideSortIcon} onselection={selectedNavHandler} name="Release Date"></c-dx-vis-sort-env-gate-header>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={formattedData} for:item="env">
+                                <template for:each={env.packages} for:item="pkg">
+                                    <tr key={pkg.packageId} class="slds-hint-parent">
+                                        <!-- <td data-label="Environment Name" class="slds-truncate" title={env.name}>{env.name}</td> -->
+                                        <td data-label="Package Name" colspan="2" class="slds-truncate"
+                                            title={pkg.name}>
+                                            <div class="fw-bold">{pkg.name}</div>
+                                            <div class="ld-version-label">Latest Deployed Version</div>
+                                            <div class="ld-version-value" title={pkg.latestDeployedVersion}>
+                                                {pkg.latestDeployedVersion}</div>
+                                            <div class="ld-version-label">Package Deploy Time</div>
+                                            <div class="ld-version-value" title={pkg.packageDeployTime}>
+                                                {pkg.packageDeployTime}</div>
+                                        </td>
+                                        <!-- <td data-label="Latest Deployed Version" class="slds-truncate" title={pkg.latestDeployedVersion}>{pkg.latestDeployedVersion}</td> -->
+                                        <td data-label="ZTT Results" class="slds-truncate" title={pkg.zttResults}>
+                                            {pkg.zttResults}
+                                        </td>
+                                        <td data-label="ZTT Status" class="slds-truncate" title={pkg.zttStatus}>
+                                            <c-dx-vis-text-info text-type={pkg.zttStatus}></c-dx-vis-text-info>
+                                        </td>
+                                        <td data-label="Enabled ZTT" class="slds-truncate" title={pkg.enabledZTT}>
+                                            <c-dx-vis-env-gate-status-button
+                                                status={pkg.enabledZTT}></c-dx-vis-env-gate-status-button>
+                                        </td>
+                                        <td data-label="PDT Results" class="slds-truncate" title={pkg.pdtResults}>
+                                            {pkg.pdtResults}</td>
+                                        <td data-label="PDT Status" class="slds-truncate" title={pkg.pdtStatus}>
+                                            <c-dx-vis-text-info text-type={pkg.pdtStatus}></c-dx-vis-text-info>
+                                        </td>
+                                        <td data-label="Enabled PDT" class="slds-truncate" title={pkg.enabledPDT}>
+                                            <c-dx-vis-env-gate-status-button
+                                                status={pkg.enabledPDT}></c-dx-vis-env-gate-status-button>
+                                        </td>
+                                        <!-- <td data-label="Risk Score" class="slds-truncate" title={pkg.riskScore}>{pkg.riskScore}</td> -->
+                                        <td data-label="Risk Score" class="slds-truncate" title={pkg.riskScore.score}>
+                                            <c-dx-vis-risk-score score={pkg.riskScore.score}
+                                                profile={pkg.riskScore.profile}></c-dx-vis-risk-score>
+                                        </td>
+                                        <td data-label="Test Execution Status" class="slds-truncate" title={pkg.testExecutionTimeStatus}>
+                                            <c-dx-vis-text-info text-type={pkg.testExecutionTimeStatus}></c-dx-vis-text-info>
+                                        </td>
+                                        <td data-label="Release Date" class="slds-truncate" title={pkg.release}>
+                                            {pkg.release}</td>
+                                    </tr>
+                                </template>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <c-dx-footer></c-dx-footer>
+        </div>
+    </template>
+    <template if:false={formattedData}>
+        <c-dx-vis-no-data-sfdx></c-dx-vis-no-data-sfdx>
+    </template>
+</template>
