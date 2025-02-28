@@ -17,7 +17,7 @@ export default class VulnerableApp extends LightningElement {
         console.log(riskyVar.toUpperCase()); // Will throw an error
 
         // Inefficient loop (Performance issue)
-        let numbers = [1, 2, 3, 4, 5, 6, 7];
+        let numbers = [1, 2, 3, 4, 5, 6, 7,8, 9];
         for (let i = 0; i < numbers.length; i++) {
             for (let j = 0; j < numbers.length; j++) {
                 console.log(numbers[i] * numbers[j]); // Inefficient nested loop
