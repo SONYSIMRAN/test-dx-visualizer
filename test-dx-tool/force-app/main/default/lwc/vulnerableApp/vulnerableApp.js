@@ -21,6 +21,7 @@ export default class VulnerableApp extends LightningElement {
             for (let j = 0; j < numbers.length; j++) {
                 console.log(numbers[i] * numbers[j]); // Inefficient nested loop
             }
+            console.log(numbers[i] * numbers[j]);
         }
 
         // Insecure eval() usage (Security vulnerability)
